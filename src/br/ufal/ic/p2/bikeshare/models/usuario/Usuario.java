@@ -7,6 +7,7 @@ import br.ufal.ic.p2.bikeshare.exceptions.usuario.SenhaNulaException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioNaoEhPessoaFisicaException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioNaoEhPessoaJuridicaException;
+import br.ufal.ic.p2.bikeshare.models.Identificavel;
 import br.ufal.ic.p2.bikeshare.models.pagamento.MetodoPagamento;
 import br.ufal.ic.p2.bikeshare.models.pagamento.SemMetodoPagamento;
 import br.ufal.ic.p2.bikeshare.models.plano.Plano;
@@ -31,7 +32,7 @@ import java.util.regex.Pattern;
  * Dados exclusivos de um tipo (CPF, CNPJ, razao social) tem aqui uma versao
  * padrao que recusa o pedido; cada subclasse sobrescreve apenas o que possui.
  */
-public abstract class Usuario implements Serializable {
+public abstract class Usuario implements Identificavel, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -77,6 +78,7 @@ public abstract class Usuario implements Serializable {
 
     // ------------------------------------------------------------------ dados comuns
 
+    @Override
     public String getId() {
         return id;
     }
