@@ -217,6 +217,6 @@ public class Facade {
     }
 
     public void encerrarSistema() {
-        // a persistencia do estado entre execucoes entra na proxima etapa
+        sistema.encerrar();
     }
 }
