@@ -1,40 +1,59 @@
 package br.ufal.ic.p2.bikeshare;
 
+import br.ufal.ic.p2.bikeshare.controllers.Sistema;
+import br.ufal.ic.p2.bikeshare.exceptions.BikeshareException;
+
 /**
- Facade
+ * Unico ponto de entrada da logica de negocio (requisito nao funcional 1).
+ *
+ * Padrao Facade: os testes de aceitacao (EasyAccept) chamam estes metodos
+ * por reflexao. Cada metodo apenas repassa o pedido ao controller certo,
+ * sem nenhuma regra de negocio aqui.
+ *
+ * Os metodos de criarUsuario e alterarUsuario tem varias versoes
+ * (sobrecarga): o EasyAccept escolhe a versao pela quantidade de parametros.
  */
 public class Facade {
 
     private static final String AINDA_NAO_IMPLEMENTADO = "Ainda não implementado.";
 
+    private final Sistema sistema = new Sistema();
+
     // =====================================================================
     // US1 - Cadastro de usuario
     // =====================================================================
 
-    public String criarUsuario(String nome, String email, String senha, String tipo, String cpfOuCnpj) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    /** Pessoa fisica, plano avulso. */
+    public String criarUsuario(String nome, String email, String senha, String tipo, String cpfOuCnpj)
+            throws BikeshareException {
+        return sistema.usuarios().criarPessoaFisica(nome, email, senha, tipo, cpfOuCnpj);
     }
 
-    public String criarUsuario(String nome, String email, String senha, String tipo, String cnpj, String razaoSocial) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
-    }
-
-    public String criarUsuario(String nome, String email, String senha, String tipo, String cpf,
-                                String plano, String mensalidade) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
-    }
-
+    /** Pessoa juridica, plano avulso. */
     public String criarUsuario(String nome, String email, String senha, String tipo, String cnpj,
-                                String razaoSocial, String plano, String mensalidade) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+                               String razaoSocial) throws BikeshareException {
+        return sistema.usuarios().criarPessoaJuridica(nome, email, senha, tipo, cnpj, razaoSocial);
+    }
+
+    /** Pessoa fisica, plano escolhido. */
+    public String criarUsuario(String nome, String email, String senha, String tipo, String cpf,
+                               String plano, String mensalidade) throws BikeshareException {
+        return sistema.usuarios().criarPessoaFisica(nome, email, senha, tipo, cpf, plano, mensalidade);
+    }
+
+    /** Pessoa juridica, plano escolhido. */
+    public String criarUsuario(String nome, String email, String senha, String tipo, String cnpj,
+                               String razaoSocial, String plano, String mensalidade) throws BikeshareException {
+        return sistema.usuarios().criarPessoaJuridica(nome, email, senha, tipo, cnpj, razaoSocial,
+                plano, mensalidade);
     }
 
     // =====================================================================
     // US2 - Consulta de usuario
     // =====================================================================
 
-    public String getAtributoUsuario(String usuario, String atributo) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    public String getAtributoUsuario(String usuario, String atributo) throws BikeshareException {
+        return sistema.usuarios().getAtributo(usuario, atributo);
     }
 
     public String getUsuarioPorEmail(String email) {
@@ -194,10 +213,10 @@ public class Facade {
     // =====================================================================
 
     public void zerarSistema() {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+        sistema.zerar();
     }
 
     public void encerrarSistema() {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+        // a persistencia do estado entre execucoes entra na proxima etapa
     }
 }
