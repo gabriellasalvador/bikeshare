@@ -14,8 +14,10 @@ import br.ufal.ic.p2.bikeshare.models.plano.Plano;
 import br.ufal.ic.p2.bikeshare.utils.Validacao;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -46,6 +48,8 @@ public abstract class Usuario implements Identificavel, Serializable {
     private Plano plano;
     private MetodoPagamento metodoPagamento = new SemMetodoPagamento();
     private EstadoUsuario estado = EstadoUsuario.ATIVO;
+    private String idAluguelAtivo;
+    private BigDecimal totalPendencias = BigDecimal.ZERO;
 
     /**
      * Cria um usuario ativo, sem metodo de pagamento.
@@ -146,6 +150,22 @@ public abstract class Usuario implements Identificavel, Serializable {
 
     public EstadoUsuario getEstado() {
         return estado;
+    }
+
+    /**
+     * Id do aluguel que o usuario esta fazendo agora, se houver.
+     *
+     * @return o id do aluguel em andamento, ou vazio se nao houver nenhum
+     */
+    public Optional<String> getIdAluguelAtivo() {
+        return Optional.ofNullable(idAluguelAtivo);
+    }
+
+    /**
+     * Soma das penalidades que o usuario ainda nao pagou. Comeca em zero.
+     */
+    public BigDecimal getTotalPendencias() {
+        return totalPendencias;
     }
 
     // ------------------------------------------------------------------ dados exclusivos

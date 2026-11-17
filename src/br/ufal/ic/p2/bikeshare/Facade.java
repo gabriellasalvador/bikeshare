@@ -56,8 +56,8 @@ public class Facade {
         return sistema.usuarios().getAtributo(usuario, atributo);
     }
 
-    public String getUsuarioPorEmail(String email) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    public String getUsuarioPorEmail(String email) throws BikeshareException {
+        return sistema.usuarios().getIdPorEmail(email);
     }
 
     // =====================================================================

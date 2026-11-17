@@ -3,6 +3,7 @@ package br.ufal.ic.p2.bikeshare.controllers;
 import br.ufal.ic.p2.bikeshare.exceptions.BikeshareException;
 import br.ufal.ic.p2.bikeshare.exceptions.comum.TipoInvalidoException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.EmailJaCadastradoException;
+import br.ufal.ic.p2.bikeshare.exceptions.usuario.EmailNuloException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.IdentificacaoUsuarioNulaException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioNaoExisteException;
 import br.ufal.ic.p2.bikeshare.models.plano.CatalogoDePlanos;
@@ -13,17 +14,21 @@ import br.ufal.ic.p2.bikeshare.models.usuario.Usuario;
 import br.ufal.ic.p2.bikeshare.repositories.FabricaComId;
 import br.ufal.ic.p2.bikeshare.repositories.Repositorio;
 import br.ufal.ic.p2.bikeshare.utils.Formatador;
+import br.ufal.ic.p2.bikeshare.utils.Validacao;
 
 import java.util.Objects;
 
 /**
- * Coordena os casos de uso de usuario: cadastro e consulta.
+ * Coordena os casos de uso de usuario: cadastro (US1) e consulta (US2).
  *
  * Nao guarda regra de negocio propria: valida o que envolve VARIOS usuarios
  * (email repetido) e delega o resto aos modelos (cada usuario valida seus
  * dados, cada plano valida sua mensalidade).
  */
 public class UsuarioController {
+
+    /** Texto exibido quando o usuario nao tem aluguel em andamento. */
+    private static final String SEM_ALUGUEL = "nenhum";
 
     /** Atributos que podem ser consultados e como cada um e lido. */
     private static final TabelaDeAtributos<Usuario> ATRIBUTOS = new TabelaDeAtributos<Usuario>()
@@ -35,6 +40,12 @@ public class UsuarioController {
             .com("plano", u -> u.getPlano().getNome())
             .com("mensalidade", u -> Formatador.moeda(u.getPlano().getMensalidade()))
             .com("metodoPagamento", u -> u.getMetodoPagamento().getNome())
+            .com("numeroCartao", u -> u.getMetodoPagamento().getNumeroCartao())
+            .com("validadeCartao", u -> u.getMetodoPagamento().getValidadeCartao())
+            .com("chavePix", u -> u.getMetodoPagamento().getChavePix())
+            .com("saldo", u -> Formatador.moeda(u.getMetodoPagamento().getSaldo()))
+            .com("aluguelAtivo", u -> u.getIdAluguelAtivo().orElse(SEM_ALUGUEL))
+            .com("totalPendencias", u -> Formatador.moeda(u.getTotalPendencias()))
             .com("cpf", Usuario::getCpf)
             .com("cnpj", Usuario::getCnpj)
             .com("razaoSocial", Usuario::getRazaoSocial);
@@ -111,6 +122,20 @@ public class UsuarioController {
     public String getAtributo(String idUsuario, String atributo) throws BikeshareException {
         Usuario usuario = buscar(idUsuario);
         return ATRIBUTOS.ler(usuario, atributo);
+    }
+
+    /**
+     * Encontra o usuario dono de um email, sem diferenciar maiusculas de minusculas.
+     *
+     * @return id do usuario (ex.: "U1")
+     * @throws EmailNuloException        se o email estiver vazio
+     * @throws UsuarioNaoExisteException se nenhum usuario usar esse email
+     */
+    public String getIdPorEmail(String email) throws EmailNuloException, UsuarioNaoExisteException {
+        Validacao.exigirPreenchido(email, EmailNuloException::new);
+        return usuarios.buscarPrimeiro(usuario -> usuario.temEmail(email))
+                .orElseThrow(UsuarioNaoExisteException::new)
+                .getId();
     }
 
     // ------------------------------------------------------------------ internos
