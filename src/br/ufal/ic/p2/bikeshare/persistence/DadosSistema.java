@@ -6,6 +6,10 @@ import br.ufal.ic.p2.bikeshare.models.plano.CatalogoDePlanos;
 import br.ufal.ic.p2.bikeshare.models.usuario.Usuario;
 import br.ufal.ic.p2.bikeshare.repositories.Repositorio;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -16,7 +20,8 @@ import java.io.Serializable;
  * objeto preserva tudo, inclusive a sequencia dos proximos ids.
  *
  * A cada nova User Story com dados novos (estacoes, alugueis...), basta
- * acrescentar o repositorio correspondente aqui.
+ * acrescentar o repositorio correspondente aqui E na conferencia de
+ * {@link #readObject(ObjectInputStream)}.
  */
 public final class DadosSistema implements Serializable {
 
@@ -43,5 +48,23 @@ public final class DadosSistema implements Serializable {
 
     public Repositorio<Estacao> getEstacoes() {
         return estacoes;
+    }
+
+    /**
+     * Chamado pelo Java ao ler este objeto do arquivo.
+     *
+     * Um arquivo gravado por uma versao anterior do sistema nao tem os
+     * repositorios criados depois dela, e eles chegariam vazios (null).
+     * Em vez de deixar o sistema quebrar mais adiante, a leitura e recusada
+     * aqui, com uma mensagem clara.
+     *
+     * @throws InvalidObjectException se faltar alguma parte do estado
+     */
+    @Serial
+    private void readObject(ObjectInputStream entrada) throws IOException, ClassNotFoundException {
+        entrada.defaultReadObject();
+        if (planos == null || usuarios == null || estacoes == null) {
+            throw new InvalidObjectException("Arquivo de dados de uma versao anterior do sistema.");
+        }
     }
 }
