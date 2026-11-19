@@ -64,16 +64,21 @@ public class Facade {
     // US3 - Alteracao de usuario (inclui metodo de pagamento)
     // =====================================================================
 
-    public void alterarUsuario(String usuario, String atributo, String valor) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    /** Atributo simples, recarga de saldo ou metodo saldo pre-carregado. */
+    public void alterarUsuario(String usuario, String atributo, String valor) throws BikeshareException {
+        sistema.usuarios().alterar(usuario, atributo, valor);
     }
 
-    public void alterarUsuario(String usuario, String atributo, String valor1, String chave) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    /** Metodo de pagamento com chave (pix). */
+    public void alterarUsuario(String usuario, String atributo, String valor1, String chave)
+            throws BikeshareException {
+        sistema.usuarios().alterarMetodoPagamento(usuario, atributo, valor1, chave);
     }
 
-    public void alterarUsuario(String usuario, String atributo, String valor1, String numero, String validade) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    /** Metodo de pagamento com numero e validade (cartao). */
+    public void alterarUsuario(String usuario, String atributo, String valor1, String numero, String validade)
+            throws BikeshareException {
+        sistema.usuarios().alterarMetodoPagamento(usuario, atributo, valor1, numero, validade);
     }
 
     // =====================================================================
