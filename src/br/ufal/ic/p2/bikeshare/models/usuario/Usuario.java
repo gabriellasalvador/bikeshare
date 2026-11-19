@@ -8,7 +8,9 @@ import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioNaoEhPessoaFisicaException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioNaoEhPessoaJuridicaException;
 import br.ufal.ic.p2.bikeshare.models.Identificavel;
+import br.ufal.ic.p2.bikeshare.models.pagamento.Carteira;
 import br.ufal.ic.p2.bikeshare.models.pagamento.MetodoPagamento;
+import br.ufal.ic.p2.bikeshare.models.pagamento.SaldoPreCarregado;
 import br.ufal.ic.p2.bikeshare.models.pagamento.SemMetodoPagamento;
 import br.ufal.ic.p2.bikeshare.models.plano.Plano;
 import br.ufal.ic.p2.bikeshare.utils.Validacao;
@@ -33,6 +35,9 @@ import java.util.regex.Pattern;
  *
  * Dados exclusivos de um tipo (CPF, CNPJ, razao social) tem aqui uma versao
  * padrao que recusa o pedido; cada subclasse sobrescreve apenas o que possui.
+ *
+ * A carteira (saldo pre-carregado) fica escondida aqui dentro: so e usada
+ * atraves do metodo de pagamento, nunca entregue para fora.
  */
 public abstract class Usuario implements Identificavel, Serializable {
 
@@ -46,6 +51,7 @@ public abstract class Usuario implements Identificavel, Serializable {
     private String email;
     private String senha;
     private Plano plano;
+    private final Carteira carteira = new Carteira();
     private MetodoPagamento metodoPagamento = new SemMetodoPagamento();
     private EstadoUsuario estado = EstadoUsuario.ATIVO;
     private String idAluguelAtivo;
@@ -144,8 +150,20 @@ public abstract class Usuario implements Identificavel, Serializable {
         return metodoPagamento;
     }
 
+    /**
+     * Troca o metodo de pagamento (cartao ou pix). O saldo da carteira
+     * continua guardado, caso o usuario volte a usar saldo pre-carregado.
+     */
     public void setMetodoPagamento(MetodoPagamento metodoPagamento) {
         this.metodoPagamento = Objects.requireNonNull(metodoPagamento, "metodo de pagamento");
+    }
+
+    /**
+     * Passa a pagar com o saldo da propria carteira. O saldo que ja existia
+     * e mantido (a carteira e sempre a mesma, desde o cadastro).
+     */
+    public void usarSaldoPreCarregado() {
+        this.metodoPagamento = new SaldoPreCarregado(carteira);
     }
 
     public EstadoUsuario getEstado() {
