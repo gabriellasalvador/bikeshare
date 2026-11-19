@@ -1,6 +1,7 @@
 package br.ufal.ic.p2.bikeshare.persistence;
 
 import br.ufal.ic.p2.bikeshare.config.Configuracao;
+import br.ufal.ic.p2.bikeshare.models.estacao.Estacao;
 import br.ufal.ic.p2.bikeshare.models.plano.CatalogoDePlanos;
 import br.ufal.ic.p2.bikeshare.models.usuario.Usuario;
 import br.ufal.ic.p2.bikeshare.repositories.Repositorio;
@@ -23,6 +24,7 @@ public final class DadosSistema implements Serializable {
 
     private final CatalogoDePlanos planos;
     private final Repositorio<Usuario> usuarios = new Repositorio<>("U");
+    private final Repositorio<Estacao> estacoes = new Repositorio<>("E");
 
     /**
      * Cria um estado vazio, com os planos iniciais da configuracao.
@@ -37,5 +39,9 @@ public final class DadosSistema implements Serializable {
 
     public Repositorio<Usuario> getUsuarios() {
         return usuarios;
+    }
+
+    public Repositorio<Estacao> getEstacoes() {
+        return estacoes;
     }
 }

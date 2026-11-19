@@ -93,8 +93,8 @@ public class Facade {
     // US5 - Cadastro de estacao
     // =====================================================================
 
-    public String criarEstacao(String nome, String endereco, String capacidade) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    public String criarEstacao(String nome, String endereco, String capacidade) throws BikeshareException {
+        return sistema.estacoes().criar(nome, endereco, capacidade);
     }
 
     // =====================================================================
@@ -121,12 +121,12 @@ public class Facade {
     // US7 - Consulta de disponibilidade
     // =====================================================================
 
-    public String getBicicletasDisponiveis(String estacao) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    public String getBicicletasDisponiveis(String estacao) throws BikeshareException {
+        return sistema.estacoes().getBicicletasDisponiveis(estacao);
     }
 
-    public String getVagasDisponiveis(String estacao) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    public String getVagasDisponiveis(String estacao) throws BikeshareException {
+        return sistema.estacoes().getVagasDisponiveis(estacao);
     }
 
     public String getEstadoBicicleta(String bicicleta) {

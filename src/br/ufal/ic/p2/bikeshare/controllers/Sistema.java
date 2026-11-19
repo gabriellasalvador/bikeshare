@@ -16,6 +16,7 @@ public final class Sistema {
     private final ArquivoDeDados arquivo;
     private DadosSistema dados;
     private UsuarioController usuarios;
+    private EstacaoController estacoes;
 
     /**
      * Inicia o sistema com os parametros do bikeshare.properties e
@@ -45,11 +46,16 @@ public final class Sistema {
         return usuarios;
     }
 
+    public EstacaoController estacoes() {
+        return estacoes;
+    }
+
     /**
      * Passa a trabalhar com o estado informado, religando os controllers a ele.
      */
     private void usar(DadosSistema novosDados) {
         this.dados = novosDados;
         this.usuarios = new UsuarioController(dados.getUsuarios(), dados.getPlanos());
+        this.estacoes = new EstacaoController(dados.getEstacoes());
     }
 }
