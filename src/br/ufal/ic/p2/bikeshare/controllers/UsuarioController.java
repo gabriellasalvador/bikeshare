@@ -6,6 +6,7 @@ import br.ufal.ic.p2.bikeshare.exceptions.comum.TipoInvalidoException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.EmailJaCadastradoException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.EmailNuloException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.IdentificacaoUsuarioNulaException;
+import br.ufal.ic.p2.bikeshare.exceptions.usuario.RemocaoComAluguelEmAndamentoException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioNaoExisteException;
 import br.ufal.ic.p2.bikeshare.models.pagamento.FabricaDeMetodoPagamento;
 import br.ufal.ic.p2.bikeshare.models.pagamento.SaldoPreCarregado;
@@ -22,8 +23,8 @@ import br.ufal.ic.p2.bikeshare.utils.Validacao;
 import java.util.Objects;
 
 /**
- * Coordena os casos de uso de usuario: cadastro (US1), consulta (US2)
- * e alteracao (US3).
+ * Coordena os casos de uso de usuario: cadastro (US1), consulta (US2),
+ * alteracao (US3) e remocao (US4).
  *
  * Nao guarda regra de negocio propria: valida o que envolve VARIOS usuarios
  * (email repetido) e delega o resto aos modelos (cada usuario valida seus
@@ -191,6 +192,22 @@ public class UsuarioController {
         Usuario usuario = buscar(idUsuario);
         exigirMetodoPagamento(atributo);
         usuario.setMetodoPagamento(FabricaDeMetodoPagamento.comNumeroEValidade(metodo, numero, validade));
+    }
+
+    // ------------------------------------------------------------------ remocao (US4)
+
+    /**
+     * Remove um usuario. Seu email fica livre para outro cadastro, mas o id
+     * nunca e reaproveitado. Os alugueis ja feitos continuam no historico.
+     *
+     * @throws RemocaoComAluguelEmAndamentoException se o usuario estiver com uma bicicleta
+     */
+    public void remover(String idUsuario) throws BikeshareException {
+        Usuario usuario = buscar(idUsuario);
+        if (usuario.getIdAluguelAtivo().isPresent()) {
+            throw new RemocaoComAluguelEmAndamentoException();
+        }
+        usuarios.remover(usuario.getId());
     }
 
     // ------------------------------------------------------------------ internos
