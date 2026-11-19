@@ -7,19 +7,26 @@ import br.ufal.ic.p2.bikeshare.exceptions.estacao.CapacidadeNaoNumericaException
 import br.ufal.ic.p2.bikeshare.exceptions.estacao.CapacidadeNaoPositivaException;
 import br.ufal.ic.p2.bikeshare.exceptions.estacao.CapacidadeNulaException;
 import br.ufal.ic.p2.bikeshare.models.Identificavel;
+import br.ufal.ic.p2.bikeshare.models.bicicleta.Bicicleta;
 import br.ufal.ic.p2.bikeshare.utils.Conversor;
 import br.ufal.ic.p2.bikeshare.utils.Validacao;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * Ponto fixo onde as bicicletas ficam estacionadas, com um numero limitado de vagas.
  *
- * Invariantes: nome e endereco nunca ficam vazios e a capacidade e sempre
- * um numero inteiro positivo. Nada disso muda depois do cadastro.
+ * Invariantes: nome e endereco nunca ficam vazios, a capacidade e sempre
+ * um numero inteiro positivo, e nunca ha mais bicicletas do que vagas.
  *
  * Nomes repetidos sao permitidos: quem distingue uma estacao da outra e o id.
+ *
+ * E a estacao (e nao a bicicleta) que sabe quais bicicletas estao nela.
+ * Toda bicicleta estacionada ocupa uma vaga, mesmo que nao possa ser retirada
+ * (sem carga ou em manutencao).
  */
 public class Estacao implements Identificavel, Serializable {
 
@@ -29,6 +36,8 @@ public class Estacao implements Identificavel, Serializable {
     private final String nome;
     private final String endereco;
     private final int capacidade;
+    // tipo concreto (e nao List) porque ArrayList garante ser serializavel
+    private final ArrayList<Bicicleta> bicicletas = new ArrayList<>();
 
     /**
      * Valida os dados na ordem: nome, endereco, capacidade.
@@ -68,19 +77,54 @@ public class Estacao implements Identificavel, Serializable {
     }
 
     /**
-     * Quantas vagas estao livres. Enquanto a estacao nao recebe bicicletas
-     * (o que chega na US6), todas as vagas estao livres.
+     * Quantas vagas estao livres (capacidade menos bicicletas estacionadas).
      */
     public int getVagasLivres() {
-        return capacidade;
+        return capacidade - bicicletas.size();
     }
 
     /**
-     * Quantas bicicletas podem ser retiradas agora. Enquanto a estacao nao
-     * recebe bicicletas (o que chega na US6), nao ha nenhuma.
+     * Indica se ainda cabe mais uma bicicleta.
      */
-    public int getBicicletasDisponiveis() {
-        return 0;
+    public boolean temVagaLivre() {
+        return getVagasLivres() > 0;
+    }
+
+    /**
+     * Quantas bicicletas estacionadas aqui podem ser retiradas agora.
+     *
+     * @param bateriaMinima carga minima exigida das bicicletas com bateria
+     */
+    public int getBicicletasDisponiveis(int bateriaMinima) {
+        return (int) bicicletas.stream().filter(b -> b.podeSerRetirada(bateriaMinima)).count();
+    }
+
+    /**
+     * Indica se a bicicleta esta estacionada nesta estacao.
+     */
+    public boolean contem(Bicicleta bicicleta) {
+        return bicicletas.contains(bicicleta);
+    }
+
+    /**
+     * Estaciona uma bicicleta, ocupando uma vaga.
+     *
+     * @param bicicleta bicicleta a estacionar
+     * @param seCheia   fabrica do erro para estacao sem vaga (cada comando tem sua mensagem)
+     * @throws E se nao houver vaga livre (nada e alterado)
+     */
+    public <E extends BikeshareException> void estacionar(Bicicleta bicicleta, Supplier<E> seCheia) throws E {
+        if (!temVagaLivre()) {
+            throw seCheia.get();
+        }
+        bicicletas.add(Objects.requireNonNull(bicicleta, "bicicleta"));
+    }
+
+    /**
+     * Tira uma bicicleta da estacao, liberando a vaga.
+     */
+    public void liberar(Bicicleta bicicleta) {
+        bicicletas.remove(bicicleta);
     }
 
     private static int validarCapacidade(String texto) throws BikeshareException {

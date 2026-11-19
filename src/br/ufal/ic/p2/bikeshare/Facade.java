@@ -101,20 +101,23 @@ public class Facade {
     // US6 - Gestao de bicicletas na estacao
     // =====================================================================
 
-    public void adicionarBicicleta(String estacao, String bicicleta, String tipo) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    /** Bicicleta sem bateria (convencional). */
+    public void adicionarBicicleta(String estacao, String bicicleta, String tipo) throws BikeshareException {
+        sistema.bicicletas().adicionar(estacao, bicicleta, tipo);
     }
 
-    public void adicionarBicicleta(String estacao, String bicicleta, String tipo, String nivelBateria) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    /** Bicicleta com bateria (eletrica). */
+    public void adicionarBicicleta(String estacao, String bicicleta, String tipo, String nivelBateria)
+            throws BikeshareException {
+        sistema.bicicletas().adicionar(estacao, bicicleta, tipo, nivelBateria);
     }
 
-    public void removerBicicleta(String estacao, String bicicleta) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    public void removerBicicleta(String estacao, String bicicleta) throws BikeshareException {
+        sistema.bicicletas().remover(estacao, bicicleta);
     }
 
-    public String getAtributoBicicleta(String bicicleta, String atributo) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    public String getAtributoBicicleta(String bicicleta, String atributo) throws BikeshareException {
+        return sistema.bicicletas().getAtributo(bicicleta, atributo);
     }
 
     // =====================================================================
@@ -129,8 +132,8 @@ public class Facade {
         return sistema.estacoes().getVagasDisponiveis(estacao);
     }
 
-    public String getEstadoBicicleta(String bicicleta) {
-        throw new UnsupportedOperationException(AINDA_NAO_IMPLEMENTADO);
+    public String getEstadoBicicleta(String bicicleta) throws BikeshareException {
+        return sistema.bicicletas().getEstado(bicicleta);
     }
 
     // =====================================================================
