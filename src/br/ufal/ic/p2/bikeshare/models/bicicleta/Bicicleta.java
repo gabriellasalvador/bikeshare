@@ -1,5 +1,6 @@
 package br.ufal.ic.p2.bikeshare.models.bicicleta;
 
+import br.ufal.ic.p2.bikeshare.exceptions.bicicleta.BateriaInsuficienteException;
 import br.ufal.ic.p2.bikeshare.exceptions.bicicleta.BicicletaSemBateriaException;
 import br.ufal.ic.p2.bikeshare.models.Identificavel;
 
@@ -66,6 +67,25 @@ public abstract class Bicicleta implements Identificavel, Serializable {
      */
     public boolean podeSerRetirada(int bateriaMinima) {
         return estado == EstadoBicicleta.DISPONIVEL && temCargaSuficiente(bateriaMinima);
+    }
+
+    /**
+     * Confere se a carga basta para uma corrida.
+     *
+     * @param bateriaMinima carga minima exigida das bicicletas com bateria
+     * @throws BateriaInsuficienteException se a carga estiver abaixo do minimo
+     */
+    public void exigirCargaSuficiente(int bateriaMinima) throws BateriaInsuficienteException {
+        if (!temCargaSuficiente(bateriaMinima)) {
+            throw new BateriaInsuficienteException();
+        }
+    }
+
+    /**
+     * Marca a bicicleta como em uso, no inicio de uma corrida.
+     */
+    public void iniciarUso() {
+        this.estado = EstadoBicicleta.EM_USO;
     }
 
     /**

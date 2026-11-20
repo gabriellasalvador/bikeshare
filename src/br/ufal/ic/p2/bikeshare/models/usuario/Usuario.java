@@ -4,7 +4,9 @@ import br.ufal.ic.p2.bikeshare.exceptions.comum.NomeNuloException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.EmailInvalidoException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.EmailNuloException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.SenhaNulaException;
+import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioComAluguelEmAndamentoException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioException;
+import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioInadimplenteException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioNaoEhPessoaFisicaException;
 import br.ufal.ic.p2.bikeshare.exceptions.usuario.UsuarioNaoEhPessoaJuridicaException;
 import br.ufal.ic.p2.bikeshare.models.Identificavel;
@@ -184,6 +186,33 @@ public abstract class Usuario implements Identificavel, Serializable {
      */
     public BigDecimal getTotalPendencias() {
         return totalPendencias;
+    }
+
+    // ------------------------------------------------------------------ aluguel
+
+    /**
+     * Confere se o usuario, por sua propria situacao, pode iniciar uma corrida.
+     * O metodo de pagamento e conferido a parte, depois da bicicleta.
+     *
+     * @throws UsuarioInadimplenteException           se tiver penalidades nao pagas
+     * @throws UsuarioComAluguelEmAndamentoException  se ja estiver com uma bicicleta
+     */
+    public void verificarPodeRetirar() throws UsuarioException {
+        if (estado == EstadoUsuario.INADIMPLENTE) {
+            throw new UsuarioInadimplenteException();
+        }
+        if (idAluguelAtivo != null) {
+            throw new UsuarioComAluguelEmAndamentoException();
+        }
+    }
+
+    /**
+     * Registra que o usuario comecou uma corrida.
+     *
+     * @param idAluguel id do aluguel que acabou de ser criado
+     */
+    public void iniciarAluguel(String idAluguel) {
+        this.idAluguelAtivo = Objects.requireNonNull(idAluguel, "id do aluguel");
     }
 
     // ------------------------------------------------------------------ dados exclusivos
