@@ -6,9 +6,12 @@ import br.ufal.ic.p2.bikeshare.exceptions.bicicleta.NivelBateriaNaoNumericoExcep
 import br.ufal.ic.p2.bikeshare.exceptions.bicicleta.NivelBateriaNuloException;
 import br.ufal.ic.p2.bikeshare.utils.Conversor;
 
+import java.math.BigDecimal;
+import java.time.Duration;
+
 /**
- * Bicicleta com motor eletrico. Tem bateria e so pode ser retirada com carga
- * igual ou acima do minimo configurado.
+ * Bicicleta com motor eletrico. Tem bateria, so pode ser retirada com carga
+ * igual ou acima do minimo configurado e cobra um adicional por minuto.
  *
  * Invariante: o nivel de bateria e sempre um inteiro de 0 a 100.
  */
@@ -53,6 +56,15 @@ public final class BicicletaEletrica extends Bicicleta {
     @Override
     protected boolean temCargaSuficiente(int bateriaMinima) {
         return nivelBateria >= bateriaMinima;
+    }
+
+    /**
+     * Adicional = minutos da corrida x valor configurado por minuto.
+     * E cobrado mesmo dentro da franquia do plano assinante.
+     */
+    @Override
+    public BigDecimal calcularAdicional(Duration duracao, BigDecimal adicionalPorMinuto) {
+        return adicionalPorMinuto.multiply(BigDecimal.valueOf(duracao.toMinutes()));
     }
 
     private static int validarNivel(String texto) throws BicicletaException {

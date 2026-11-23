@@ -5,6 +5,8 @@ import br.ufal.ic.p2.bikeshare.exceptions.bicicleta.BicicletaSemBateriaException
 import br.ufal.ic.p2.bikeshare.models.Identificavel;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.Objects;
 
 /**
@@ -86,6 +88,32 @@ public abstract class Bicicleta implements Identificavel, Serializable {
      */
     public void iniciarUso() {
         this.estado = EstadoBicicleta.EM_USO;
+    }
+
+    /**
+     * Marca a bicicleta como disponivel de novo, ao fim de uma corrida normal.
+     */
+    public void encerrarUso() {
+        this.estado = EstadoBicicleta.DISPONIVEL;
+    }
+
+    /**
+     * Recolhe a bicicleta para manutencao (por exemplo, quando a corrida
+     * passou do tempo maximo).
+     */
+    public void enviarParaManutencao() {
+        this.estado = EstadoBicicleta.EM_MANUTENCAO;
+    }
+
+    /**
+     * Valor extra cobrado pelo uso desta bicicleta, alem da tarifa do plano.
+     * Por padrao, nenhum; quem tiver adicional sobrescreve.
+     *
+     * @param duracao            tempo da corrida
+     * @param adicionalPorMinuto valor configurado por minuto
+     */
+    public BigDecimal calcularAdicional(Duration duracao, BigDecimal adicionalPorMinuto) {
+        return BigDecimal.ZERO;
     }
 
     /**

@@ -215,6 +215,27 @@ public abstract class Usuario implements Identificavel, Serializable {
         this.idAluguelAtivo = Objects.requireNonNull(idAluguel, "id do aluguel");
     }
 
+    /**
+     * Registra que o usuario devolveu a bicicleta e pode alugar de novo.
+     */
+    public void encerrarAluguel() {
+        this.idAluguelAtivo = null;
+    }
+
+    /**
+     * Soma uma penalidade as pendencias. Com pendencias, o usuario fica
+     * inadimplente e nao pode retirar bicicletas.
+     *
+     * @param valor valor da penalidade, positivo
+     */
+    public void registrarPenalidade(BigDecimal valor) {
+        if (valor.signum() <= 0) {
+            throw new IllegalArgumentException("Penalidade deve ser positiva: " + valor);
+        }
+        this.totalPendencias = totalPendencias.add(valor);
+        this.estado = EstadoUsuario.INADIMPLENTE;
+    }
+
     // ------------------------------------------------------------------ dados exclusivos
 
     /**
