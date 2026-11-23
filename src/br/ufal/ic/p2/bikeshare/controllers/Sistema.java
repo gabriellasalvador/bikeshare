@@ -70,6 +70,6 @@ public final class Sistema {
         this.estacoes = new EstacaoController(dados.getEstacoes(), bateriaMinima);
         this.bicicletas = new BicicletaController(dados.getBicicletas(), dados.getEstacoes());
         this.alugueis = new AluguelController(dados.getAlugueis(), dados.getUsuarios(),
-                dados.getEstacoes(), dados.getBicicletas(), bateriaMinima);
+                dados.getEstacoes(), dados.getBicicletas(), configuracao);
     }
 }
