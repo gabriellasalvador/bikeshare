@@ -1,6 +1,7 @@
 package br.ufal.ic.p2.bikeshare.persistence;
 
 import br.ufal.ic.p2.bikeshare.config.Configuracao;
+import br.ufal.ic.p2.bikeshare.models.aluguel.Aluguel;
 import br.ufal.ic.p2.bikeshare.models.bicicleta.Bicicleta;
 import br.ufal.ic.p2.bikeshare.models.estacao.Estacao;
 import br.ufal.ic.p2.bikeshare.models.plano.CatalogoDePlanos;
@@ -33,6 +34,7 @@ public final class DadosSistema implements Serializable {
     private final Repositorio<Usuario> usuarios = new Repositorio<>("U");
     private final Repositorio<Estacao> estacoes = new Repositorio<>("E");
     private final Registro<Bicicleta> bicicletas = new Registro<>();
+    private final Repositorio<Aluguel> alugueis = new Repositorio<>("A");
 
     /**
      * Cria um estado vazio, com os planos iniciais da configuracao.
@@ -57,6 +59,10 @@ public final class DadosSistema implements Serializable {
         return bicicletas;
     }
 
+    public Repositorio<Aluguel> getAlugueis() {
+        return alugueis;
+    }
+
     /**
      * Chamado pelo Java ao ler este objeto do arquivo.
      *
@@ -70,7 +76,8 @@ public final class DadosSistema implements Serializable {
     @Serial
     private void readObject(ObjectInputStream entrada) throws IOException, ClassNotFoundException {
         entrada.defaultReadObject();
-        if (planos == null || usuarios == null || estacoes == null || bicicletas == null) {
+        if (planos == null || usuarios == null || estacoes == null || bicicletas == null
+                || alugueis == null) {
             throw new InvalidObjectException("Arquivo de dados de uma versao anterior do sistema.");
         }
     }
